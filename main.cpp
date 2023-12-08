@@ -2,6 +2,7 @@
 #include "TM1637Display.h"
 #include "TimeDisplay.h"
 
+radio_drivers::SevenSegment disp(); 
 
 void setup() 
 {

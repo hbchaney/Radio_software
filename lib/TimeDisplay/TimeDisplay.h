@@ -36,6 +36,7 @@ class SevenSegment : public TM1637Display
 {
     public: 
     SevenSegment(uint8_t in_clk_pin, uint8_t in_data_pin, RadioTime& in_ref); 
+    void display_station(float station); //display the current radio station (when in radio select mode)
     void Update(); //update display based on RadioTime reference
 
 
