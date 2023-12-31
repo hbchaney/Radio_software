@@ -1,32 +1,45 @@
-#include <Arduino.h>
+#include "mode_def.h"
+#include "update.h"
+#include "Rotary_Encoder.h"
+#include "time_select_mode.h"
+#include "radio_select_mode.h"
 #include "DebugLog.h"
 
-namespace radio_software
+namespace mode_select
 {
 
-//class for managing the modes including 
-/* 
-time input mode 
-    -hour input 
-    -min input 
-    -am/pm 
-radio station select mode 
-regular clock mode
-debug mode?
+//toggles between other modes and controls the update
+class ModeManger : public base_utilities::UpdateBase
+{   
+    RadioModes current_mode = RadioModes::DEFAULT; 
+
+    //owns the following devices 
+    radio_drivers::RadioTime rad_time{12,12,true}; 
+    radio_drivers::SevenSegment seven_seg; 
+    radio_drivers::RTCDS3231 rtc; 
+    radio_drivers::Si4731 rad_module; 
+    RotaryEncoder ro_enc; 
+
+    TimeSelectMode ts_mode;     
+    RadioSelect rs_mode;
 
 
-the structure will be simple either the mode will flip a bool or a certain
-amount of time between inputs will trigger a change in mode 
-
-each mode will be its own class probably 
-
-*/
+    void process_default(Input in); 
 
 
-class RadioModeManager
-{
+    public: 
+    ModeManger(
+        uint8_t disp_clk, uint8_t disp_data, //disp 
+        TwoWire& in_wire, //rtc
+        uint8_t rst_pin, uint8_t sen_pin, TwoWire& in_wire_2, // radio module
+        uint8_t r_inc, uint8_t r_dec, uint8_t r_push
+    );
 
+    void init() override; 
 
+    //grabs re outputs and 
+    void update() override; 
+    void fix_update() override; 
 }; 
 
-}
+}; 

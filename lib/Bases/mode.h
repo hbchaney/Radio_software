@@ -10,7 +10,7 @@ class Mode
     public: 
 
     //return true to switch out of mode 
-    virtual bool process_input(Input in); 
+    virtual bool process_input(Input in) = 0; 
 }; 
 
 

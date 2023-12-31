@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include <Wire.h>
 
-namespace radio_modules
+namespace radio_drivers
 { 
 
     enum class Si4731_GPIO

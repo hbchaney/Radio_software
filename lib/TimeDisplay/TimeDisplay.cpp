@@ -125,7 +125,20 @@ SevenSegment::SevenSegment(uint8_t in_clk_pin, uint8_t in_data_pin, RadioTime& i
     TM1637Display(in_clk_pin,in_data_pin)
 {}
 
-void SevenSegment::Update() 
+void SevenSegment::Update(bool show_dots) 
 {
-    showNumberDecEx(time_ref.get_hours() * 100 + time_ref.get_mins(),0b11100000); 
+    if (show_dots) 
+    {
+        showNumberDecEx(time_ref.get_hours() * 100 + time_ref.get_mins(),0b11100000);
+    }
+    else
+    {
+        showNumberDecEx(time_ref.get_hours() * 100 + time_ref.get_mins());
+    }
+}
+
+void SevenSegment::display_station(uint station)
+{
+    //cant really display the station with the corrent decimal location so wont even try 
+    showNumberDecEx(station); 
 }

@@ -1,7 +1,7 @@
 #include "Si4731_driver.h"
 #include "DebugLog.h"
 
-radio_modules::Si4731::Si4731(uint8_t rst_pin,
+radio_drivers::Si4731::Si4731(uint8_t rst_pin,
         uint8_t sen_pin, 
         TwoWire& in_wire) : 
 wire_ref(in_wire), 
@@ -9,7 +9,7 @@ sen{sen_pin},
 rst{rst_pin}
 {}
     
-bool radio_modules::Si4731::init() 
+bool radio_drivers::Si4731::init() 
 {
     //start up sen 
     set_sen(); 
@@ -41,12 +41,12 @@ bool radio_modules::Si4731::init()
     return true; 
 }
 
-radio_modules::Si4731::~Si4731()
+radio_drivers::Si4731::~Si4731()
 {
     wire_ref.end(); 
 }
 
-bool radio_modules::Si4731::test_connection() 
+bool radio_drivers::Si4731::test_connection() 
 {   
     //start i2c connection 
     wire_ref.begin(); 
@@ -67,7 +67,7 @@ bool radio_modules::Si4731::test_connection()
     return true; 
 }
 
-bool radio_modules::Si4731::reset_chip() 
+bool radio_drivers::Si4731::reset_chip() 
 {
     //turn down then up again (docs says it only needs to be for 10 ns)
     LOG_DEBUG("attempting to reset"); 
@@ -81,7 +81,7 @@ bool radio_modules::Si4731::reset_chip()
     return test_connection(); //return if still connected
 }
 
-void radio_modules::Si4731::set_sen()
+void radio_drivers::Si4731::set_sen()
 {
     LOG_DEBUG("setting SEN pin to low"); 
     pinMode(sen,OUTPUT); 
@@ -90,7 +90,7 @@ void radio_modules::Si4731::set_sen()
     delay(10); 
 }
 
-bool radio_modules::Si4731::set_radio_station(float input_station)
+bool radio_drivers::Si4731::set_radio_station(float input_station)
 {
     uint16_t freq = input_station * 10; 
     freq *= 10; 
@@ -123,7 +123,7 @@ bool radio_modules::Si4731::set_radio_station(float input_station)
     return true; 
 }
 
-bool radio_modules::Si4731::tune_frequency(bool tune_up) 
+bool radio_drivers::Si4731::tune_frequency(bool tune_up) 
 {
     LOG_DEBUG("tuning frequency : ", tune_up ? "up" : "down"); 
     bool status = true; 
@@ -153,13 +153,13 @@ bool radio_modules::Si4731::tune_frequency(bool tune_up)
     return status; 
 }
 
-radio_modules::TuneStatus radio_modules::Si4731::get_radio_frequency(bool abort_seek)
+radio_drivers::TuneStatus radio_drivers::Si4731::get_radio_frequency(bool abort_seek)
 {
     //checks the status command and returns the frequency 
     //also logs the statuses 
     //if error returns 0; 
     LOG_DEBUG("running through get frequency function"); 
-    radio_modules::TuneStatus tune_stat; 
+    radio_drivers::TuneStatus tune_stat; 
     tune_stat.status = wait_for_cts();
 
     wire_ref.begin(); 
@@ -222,13 +222,13 @@ radio_modules::TuneStatus radio_modules::Si4731::get_radio_frequency(bool abort_
 }
 
 
-bool radio_modules::Si4731::set_gpio(Si4731_GPIO in_gpio, 
+bool radio_drivers::Si4731::set_gpio(Si4731_GPIO in_gpio, 
     bool status)
 {
     return true;
 }
 
-bool radio_modules::Si4731::wait_for_cts()
+bool radio_drivers::Si4731::wait_for_cts()
 {
     //add a break out counter in case
     int counter = 0; 
@@ -245,7 +245,7 @@ bool radio_modules::Si4731::wait_for_cts()
     return true; 
 }
 
-bool radio_modules::Si4731::power_up_cmd() 
+bool radio_drivers::Si4731::power_up_cmd() 
 {
     //check that I send something first 
     if (!wait_for_cts()) 
@@ -276,7 +276,7 @@ bool radio_modules::Si4731::power_up_cmd()
     return true; 
 }
 
-bool radio_modules::Si4731::set_audio_enabled(bool audio_enabled)
+bool radio_drivers::Si4731::set_audio_enabled(bool audio_enabled)
 {
     return true; 
 }

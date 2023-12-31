@@ -10,7 +10,7 @@ RotaryEncoder::RotaryEncoder(int pin1, int pin2, int sw) : in_pin1{pin1}, in_pin
 
 RotaryEncoder::~RotaryEncoder() {} 
 
-void RotaryEncoder::setup() { 
+void RotaryEncoder::init() { 
 
     pinMode(in_pin1,INPUT); 
     pinMode(in_pin2,INPUT); 

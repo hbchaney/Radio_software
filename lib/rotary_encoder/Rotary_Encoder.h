@@ -15,7 +15,7 @@ class RotaryEncoder : public base_utilities::UpdateBase {
     bool button_toggle = 0;     
     Input output_buffer = Input::R_NOP; //this buffer will be used with loop check to see if anything has been pressed 
     unsigned long press_start = 0;  
-    unsigned long long_press = 3000;
+    unsigned long long_press = 2000;
     unsigned long noise_floor = 20; //time that needs to be held to minimize noise 
     //checks to see if there was a increment +1 or -1 
     Input check_increment();
@@ -25,7 +25,7 @@ class RotaryEncoder : public base_utilities::UpdateBase {
     RotaryEncoder(int,int,int); 
     ~RotaryEncoder(); 
 
-    void setup(void); 
+    void init(void) override; 
 
     void update(void) override;  
 
