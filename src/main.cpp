@@ -54,11 +54,7 @@ base_utilities::UpdateBase::run_inits();
 
 void loop() 
 {
-    // sleep_ms(5000); 
-    // LOG_INFO("finished 5 sec sleep"); 
-    // sleep_ms(5000); 
     base_utilities::UpdateBase::run_updates(); 
     base_utilities::UpdateBase::run_fixed_updates(); 
 
-    sleep_ms(10); 
 }

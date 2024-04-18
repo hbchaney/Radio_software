@@ -22,14 +22,33 @@ bool RadioSelect::check_for_timeout()
 void RadioSelect::change_station(bool inc)
 {
     LOG_INFO("changing the radio station : ",inc); 
-    rad_mod.tune_frequency(inc); 
-    current_station = rad_mod.get_radio_frequency().freq;
+    current_station = inc ? current_station + 10 : current_station - 10; 
+    if (current_station < min) 
+    {
+        current_station = min;
+    }
+    else if (current_station > max) 
+    {
+        current_station = max; 
+    }
+    rad_mod.set_radio_station((current_station));  
+    sleep_ms(10);
     show_current_station(); 
 }
 
 void RadioSelect::show_current_station()
 {
-    seg_ref.display_station(current_station); 
+    seg_ref.display_station(current_station / 10); 
+}
+
+void RadioSelect::toggle_on_off()
+{
+    currently_on ^= 1; 
+    rad_mod.set_audio_enabled(currently_on); 
+    if (currently_on)
+    { 
+        rad_mod.tune_frequency(current_station); 
+    }
 }
 
 bool RadioSelect::process_input(Input in)
@@ -51,8 +70,7 @@ bool RadioSelect::process_input(Input in)
 
     if (in == Input::R_PUSH_SHORT)
     {
-        currently_on ^= 1; //alternate currently on 
-        rad_mod.set_audio_enabled(currently_on); 
+        toggle_on_off(); 
         return true; 
     }
     else if (in == Input::R_INC && currently_on)

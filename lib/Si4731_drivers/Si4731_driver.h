@@ -37,10 +37,11 @@ namespace radio_drivers
 
         //functions that will be needed 
         bool test_connection(); 
-        bool set_radio_station(float input_station); 
+        bool set_radio_station(uint16_t input_station); 
         bool set_gpio(Si4731_GPIO in_gpio, bool status);
         bool set_audio_enabled(bool audio_enabled); 
         bool tune_frequency(bool tune_up); //if false tunes down
+        bool set_mute (bool audio_enabled); 
         TuneStatus get_radio_frequency( bool abort_seek = false ); 
 
         private: 
@@ -50,10 +51,13 @@ namespace radio_drivers
         bool wait_for_cts(); 
 
         bool power_up_cmd();  
+        bool power_down_cmd(); 
         TwoWire& wire_ref; 
 
         uint8_t sen; 
         uint8_t rst;
+
+        bool currently_powered = false; 
 
         //assumes sen is low
         static constexpr uint8_t SEN_LOW_ADDRESS {0x11};
@@ -68,6 +72,9 @@ namespace radio_drivers
         static constexpr uint8_t FM_TUNE_FREQ {0x20}; 
         static constexpr uint8_t FM_SEEK_START {0x21}; 
         static constexpr uint8_t FM_TUNE_STATUS {0x22}; 
+
+        //power 
+        static constexpr uint8_t POWER_DOWN {0x11}; 
 
     }; 
 }

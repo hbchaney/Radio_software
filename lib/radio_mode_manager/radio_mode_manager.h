@@ -21,7 +21,7 @@ class ModeManger : public base_utilities::UpdateBase
     RotaryEncoder ro_enc; 
 
     TimeSelectMode ts_mode;     
-    RadioSelect rs_mode;
+    RadioSelect rs_mode; 
 
 
     void process_default(Input in); 

@@ -90,19 +90,12 @@ void radio_drivers::Si4731::set_sen()
     delay(10); 
 }
 
-bool radio_drivers::Si4731::set_radio_station(float input_station)
+bool radio_drivers::Si4731::set_radio_station(uint16_t input_station) // 10 
 {
-    uint16_t freq = input_station * 10; 
-    freq *= 10; 
-    LOG_DEBUG("tuning to station : ",freq); 
+
+    LOG_DEBUG("tuning to station : ",input_station); 
 
     wait_for_cts(); 
-
-    auto val_one = static_cast<uint8_t>(freq >>8); 
-    auto val_two = static_cast<uint8_t>(freq & 0xff);
-
-    LOG_DEBUG("val one is : ", val_one); 
-    LOG_DEBUG("val two is : ", val_two);  
 
     wire_ref.begin(); 
     wire_ref.beginTransmission(SEN_LOW_ADDRESS);
@@ -110,15 +103,15 @@ bool radio_drivers::Si4731::set_radio_station(float input_station)
     // wire_ref.write(0b00001100); 
     wire_ref.write(FM_TUNE_FREQ); 
     wire_ref.write(0b00000000); 
-    wire_ref.write(static_cast<uint8_t>(freq >>8)); 
-    wire_ref.write(static_cast<uint8_t>(freq & 0xff)); 
+    wire_ref.write(static_cast<uint8_t>(input_station >> 8)); 
+    wire_ref.write(static_cast<uint8_t>(input_station & 0xff)); 
     wire_ref.write(0); 
     auto error = wire_ref.endTransmission(); 
 
     //check the return status 
     sleep_ms(10); 
     wire_ref.requestFrom(SEN_LOW_ADDRESS,1); 
-    LOG_DEBUG("response after radio set is : ",wire_ref.read()); 
+    LOG_INFO("response after radio set is : ",wire_ref.read()); 
 
     return true; 
 }
@@ -222,7 +215,7 @@ radio_drivers::TuneStatus radio_drivers::Si4731::get_radio_frequency(bool abort_
 }
 
 
-bool radio_drivers::Si4731::set_gpio(Si4731_GPIO in_gpio, 
+bool radio_drivers::Si4731::set_gpio(radio_drivers::Si4731_GPIO in_gpio, 
     bool status)
 {
     return true;
@@ -273,10 +266,86 @@ bool radio_drivers::Si4731::power_up_cmd()
     }
 
     LOG_INFO("power up cmds entered right"); 
+    currently_powered = true; 
     return true; 
 }
 
+bool radio_drivers::Si4731::power_down_cmd()
+{
+     //check that I send something first 
+    if (!wait_for_cts()) 
+    {
+        LOG_ERROR("wait for cts timed out"); 
+        return false; 
+    }
+
+    wire_ref.begin(); 
+    wire_ref.beginTransmission(SEN_LOW_ADDRESS); 
+    wire_ref.write(POWER_DOWN); 
+    auto error = wire_ref.endTransmission(); 
+    if (error != 0) 
+    {
+        LOG_ERROR("error occured when sending message : ",error); 
+        return false; 
+    }
+
+    if (!wait_for_cts())
+    {
+        LOG_ERROR("wait for cts timed out (after power up cmd sent)"); 
+        return false; 
+    }
+
+    LOG_INFO("Powered Down"); 
+    currently_powered = false; 
+    return true; 
+}
+
+bool radio_drivers::Si4731::set_mute (bool audio_enabled)
+{
+    if (!wait_for_cts()) 
+    {
+        LOG_ERROR("wait for cts timed out"); 
+        return false; 
+    }
+
+    wire_ref.begin(); 
+    wire_ref.beginTransmission(SEN_LOW_ADDRESS); 
+    wire_ref.write(0x12); 
+    wire_ref.write(0x00); 
+    wire_ref.write(0x40); 
+    wire_ref.write(0x01); 
+    wire_ref.write(0x0); 
+    if (audio_enabled)
+    {
+        wire_ref.write(0b00000011); 
+    }
+    else 
+    {
+        wire_ref.write(0x0); 
+    }
+    auto error = wire_ref.endTransmission();
+
+    LOG_INFO("set audio returned : ", (uint8_t)wire_ref.read()); 
+
+    if (!wait_for_cts()) 
+    {
+        LOG_ERROR("wait for cts timed out"); 
+        return false; 
+    }
+    
+    return true;
+}
+
+//bool to turn on or off
 bool radio_drivers::Si4731::set_audio_enabled(bool audio_enabled)
 {
+    if (audio_enabled)
+    {
+        set_mute(false); 
+    }
+    else if (!audio_enabled)
+    {
+        set_mute(true); 
+    }
     return true; 
 }
